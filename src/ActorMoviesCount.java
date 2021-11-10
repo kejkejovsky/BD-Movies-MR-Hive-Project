@@ -48,7 +48,7 @@ public class ActorMoviesCount extends Configured implements Tool {
                 else{
                     String line = value.toString();
                     int i = 0;
-                    for(String word : WORD_BOUNDARY.split(line)){
+                    for(String word : line.split("\t")){
                         if(i == 0) {
                             tconst.set(word);
                         }
@@ -60,7 +60,7 @@ public class ActorMoviesCount extends Configured implements Tool {
                     if(category.equals("actor") || category.equals("actress") || category.equals("self")) {
                         context.write(tconst, one);
                     }else{
-                        context.write(tconst, new IntWritable(i));
+                        context.write(tconst, zero);
                     }
                 }
             } catch(Exception e){
