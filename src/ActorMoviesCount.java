@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.DoubleWritable;
@@ -37,6 +38,8 @@ public class ActorMoviesCount extends Configured implements Tool {
         private Text tconst = new Text();
         private Text category = new Text();
         private final static IntWritable one = new IntWritable(1);
+        private final static IntWritable zero = new IntWritable(0);
+        private static final Pattern WORD_BOUNDARY = Pattern.compile("\\s*\\b\\s*");
         public void map(LongWritable key, Text value, Context context)
                 throws IOException, InterruptedException {
             try{
@@ -45,7 +48,7 @@ public class ActorMoviesCount extends Configured implements Tool {
                 else{
                     String line = value.toString();
                     int i = 0;
-                    for(String word : line.split(",(?=([^\"]*\"[^\"])*[^\"]*$)")){
+                    for(String word : WORD_BOUNDARY.split(line)){
                         if(i == 0) {
                             tconst.set(word);
                         }
@@ -54,8 +57,10 @@ public class ActorMoviesCount extends Configured implements Tool {
                         }
                         i++;
                     }
-                    if(category.equals("actor") || category.equals("actress") ) {
+                    if(category.equals("actor") || category.equals("actress") || category.equals("self")) {
                         context.write(tconst, one);
+                    }else{
+                        context.write(tconst, new IntWritable(i));
                     }
                 }
             } catch(Exception e){
@@ -70,10 +75,9 @@ public class ActorMoviesCount extends Configured implements Tool {
                 throws IOException, InterruptedException {
             sum = 0;
             for(IntWritable val : values){
-                sum += val.get();
+                context.write(key, new IntWritable(val.get()));
             }
 
-            context.write(key, new IntWritable(sum));
         }
     }
 }
