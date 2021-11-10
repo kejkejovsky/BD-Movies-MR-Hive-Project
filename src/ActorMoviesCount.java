@@ -54,7 +54,7 @@ public class ActorMoviesCount extends Configured implements Tool {
                         }
                         i++;
                     }
-                    if(tconst.equals("actor") || tconst.equals("actress") ) {
+                    if(category.equals("actor") || category.equals("actress") ) {
                         context.write(tconst, one);
                     }
                 }
