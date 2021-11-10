@@ -57,7 +57,7 @@ public class ActorMoviesCount extends Configured implements Tool {
                         }
                         i++;
                     }
-                    if(category.equals("actor") || category.equals("actress") || category.equals("self")) {
+                    if(category.toString().contains("actor") || category.toString().contains("actress") || category.toString().contains("self")) {
                         context.write(tconst, one);
                     }else{
                         context.write(tconst, zero);
@@ -75,8 +75,9 @@ public class ActorMoviesCount extends Configured implements Tool {
                 throws IOException, InterruptedException {
             sum = 0;
             for(IntWritable val : values){
-                context.write(key, new IntWritable(val.get()));
+                sum += val.get();
             }
+            context.write(key, new IntWritable(sum));
 
         }
     }
