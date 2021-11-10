@@ -29,6 +29,7 @@ public class ActorMoviesCount extends Configured implements Tool {
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         job.setMapperClass(ActorMoviesCountMapper.class);
+        job.setCombinerClass(ActorMoviesCountReducer.class);
         job.setReducerClass(ActorMoviesCountReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
@@ -70,11 +71,12 @@ public class ActorMoviesCount extends Configured implements Tool {
     }
     public static class ActorMoviesCountReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         int sum;
+
         @Override
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             sum = 0;
-            for(IntWritable val : values){
+            for (IntWritable val : values) {
                 sum += val.get();
             }
             context.write(key, new IntWritable(sum));
